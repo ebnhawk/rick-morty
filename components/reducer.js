@@ -1,22 +1,24 @@
 // INITIAL STATE
 
-const initialState = {}
+const initialState = { data: [], pages: 0, activePage: 1, count: 0 }
 
 // ACTION TYPES
 
-const EXAMPLE_ACTION = 'EXAMPLE_ACTION'
+const LOADED_DATA = 'LOADED_DATA'
 
 // ACTION CREATORS
 
-const didAction = someData => ({ type: EXAMPLE_ACTION, someData })
+const loadedData = (data, page) => ({ type: LOADED_DATA, data, page })
 
 // THUNK CREATORS
-
-export const doAction = () => {
-  return async (dispatch, getState, { axios, history }) => {
-    const res = await axios.get('API_URL')
-    const someData = res.data
-    dispatch(didAction(someData))
+// Arguments available: (dispatch, getState, { axios, history})
+export const loadData = page => {
+  return async (dispatch, _, { axios }) => {
+    const res = await axios.get(
+      `https://rickandmortyapi.com/api/character/?page=${page}`
+    )
+    const data = res.data
+    dispatch(loadedData(data, page))
   }
 }
 
@@ -24,6 +26,15 @@ export const doAction = () => {
 
 export default (state = initialState, action) => {
   switch (action.type) {
+    case LOADED_DATA:
+      state = {
+        ...state,
+        data: action.data.results,
+        pages: action.data.info.pages,
+        activePage: action.page,
+        count: action.data.info.count
+      }
+      return state
     default:
       return state
   }

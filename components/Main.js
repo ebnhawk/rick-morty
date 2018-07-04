@@ -1,18 +1,30 @@
 import React, { Component } from 'react'
-import axios from 'axios'
+import { connect } from 'react-redux'
+import ListContainer from './ListContainer'
+import { loadData } from './reducer'
+import Header from './Header'
+import Pages from './Pages'
 
 class Main extends Component {
-  constructor() {
-    super()
-  }
   async componentDidMount() {
-    const res = await axios.get('https://rickandmortyapi.com/api/character/2')
-    const morty = res.data
-    console.log(`Babel polyfill is doing its job! Here's a Morty!: `, morty)
+    await this.props.loadData()
   }
   render() {
-    return <div>Hello There</div>
+    return (
+      <div id="header-container">
+        <Header />
+        <ListContainer />
+        <Pages />
+      </div>
+    )
   }
 }
 
-export default Main
+const mapDispatch = dispatch => ({
+  loadData: (page = 1) => dispatch(loadData(page))
+})
+
+export default connect(
+  null,
+  mapDispatch
+)(Main)
